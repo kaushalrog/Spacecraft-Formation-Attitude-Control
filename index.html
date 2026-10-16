@@ -9,145 +9,185 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Plain course-project page: one reading column, wide figures, maroon accent taken from the team's slides. */
+/* Wide course-project page: maroon masthead from the team's slides, full-width figure rows, two-column sections. */
 :root {
-  --bg: #fcfbf9; --fg: #1c1b1b; --muted: #5f5c5a; --line: #ddd8d3; --soft: #f3f0ec; --accent: #8a1538;
+  --bg: #f6f3f0; --card: #ffffff; --fg: #1d1a1a; --muted: #625b58; --line: #ded6d0; --soft: #efe9e4;
+  --accent: #8a1538; --mast: #5c0e26; --mast-fg: #fbf3ef; --mast-muted: #e2c5cc;
+  --c1: #2f6fbd; --c2: #d9601f; --c3: #2e8a57;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --max: 1360px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #161415; --fg: #e8e4e1; --muted: #a59f9b; --line: #36312f; --soft: #201d1d; --accent: #e07a96; color-scheme: dark; } }
-:root[data-theme="dark"] { --bg: #161415; --fg: #e8e4e1; --muted: #a59f9b; --line: #36312f; --soft: #201d1d; --accent: #e07a96; color-scheme: dark; }
+  --bg: #121011; --card: #1b1819; --fg: #ebe6e3; --muted: #aaa19d; --line: #352f2f; --soft: #221e1f; --accent: #ef8aa6; --mast: #3a0817;
+  --c1: #6ea8ee; --c2: #ff9152; --c3: #5cc98d; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #121011; --card: #1b1819; --fg: #ebe6e3; --muted: #aaa19d; --line: #352f2f; --soft: #221e1f; --accent: #ef8aa6; --mast: #3a0817;
+  --c1: #6ea8ee; --c2: #ff9152; --c3: #5cc98d; color-scheme: dark; }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 400 1.0625rem/1.65 var(--serif); }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 1rem/1.6 var(--sans); }
 a { color: var(--accent); text-underline-offset: 2px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 img { max-width: 100%; height: auto; display: block; }
-h1, h2, h3 { line-height: 1.2; text-wrap: balance; }
-h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); margin: 0 0 .6rem; }
-h2 { font-size: 1.5rem; margin: 3rem 0 .8rem; }
-h3 { font-size: 1.1rem; margin: 1.6rem 0 .4rem; }
-p { margin: 0 0 1rem; }
-ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+h1, h2, h3 { line-height: 1.15; text-wrap: balance; }
+h2 { font: 700 1.7rem/1.15 var(--serif); margin: 0 0 .9rem; }
+h3 { font: 600 1.05rem/1.3 var(--sans); margin: 0 0 .35rem; }
+p { margin: 0 0 .9rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.2rem; }
 li { margin-bottom: .35rem; }
-.col { max-width: 720px; margin: 0 auto; padding-inline: 20px; }
-.wide { max-width: 1060px; margin: 0 auto; padding-inline: 20px; }
-.top { border-bottom: 1px solid var(--line); font-family: var(--sans); font-size: .9rem; }
-.top .wide { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding-block: .7rem; }
-.top nav { display: flex; gap: 1.1rem; flex-wrap: wrap; }
-.top a { color: var(--fg); text-decoration: none; }
-.top a:hover, .top a[aria-current] { text-decoration: underline; }
-.top .home { font-weight: 600; }
-.intro { padding-top: 2.5rem; }
-.byline { font-family: var(--sans); font-size: .9rem; color: var(--muted); margin-bottom: 1.6rem; }
-.lead { font-size: 1.15rem; }
-.cta { display: inline-block; font: 600 .95rem var(--sans); background: var(--accent); color: #fff; text-decoration: none; padding: .65rem 1.1rem; border-radius: 4px; margin: .4rem 0 .4rem; }
-.note { font-family: var(--sans); font-size: .88rem; color: var(--muted); }
-figure { margin: 2rem 0; }
-figure img { border: 1px solid var(--line); background: #fff; }
-figcaption { font-family: var(--sans); font-size: .85rem; color: var(--muted); margin-top: .5rem; line-height: 1.5; }
-.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-@media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
-.pair figure { margin: 0; }
-table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: .9rem; margin: .8rem 0 1.2rem; }
-th, td { text-align: left; padding: .45rem .6rem .45rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-weight: 600; }
-.tablewrap { overflow-x: auto; }
-footer { margin-top: 4rem; border-top: 1px solid var(--line); font-family: var(--sans); font-size: .88rem; color: var(--muted); }
-footer .wide { padding-block: 1.5rem 3rem; display: grid; gap: .4rem; }
+code { font-size: .88em; }
+.prose { font: 400 1.05rem/1.65 var(--serif); }
+.note { font-size: .86rem; color: var(--muted); }
+.wrap { max-width: var(--max); margin: 0 auto; padding-inline: clamp(16px, 3vw, 40px); }
+section.band { padding-block: clamp(2.2rem, 5vw, 3.6rem); }
+section.band + section.band { border-top: 1px solid var(--line); }
+
+.mast { background: var(--mast); color: var(--mast-fg); }
+.mast nav.top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding-block: .9rem; font-size: .9rem; }
+.mast nav.top div { display: flex; gap: 1.3rem; flex-wrap: wrap; }
+.mast a { color: var(--mast-fg); text-decoration: none; }
+.mast a:hover, .mast a[aria-current] { text-decoration: underline; text-decoration-thickness: 2px; }
+.mast .home { font-weight: 600; }
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); padding-block: clamp(1.6rem, 4vw, 3rem) clamp(2rem, 4vw, 3.2rem); align-items: end; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.mast h1 { font: 700 clamp(2rem, 4.2vw, 3.1rem)/1.08 var(--serif); margin: 0 0 .9rem; }
+.mast .byline { color: var(--mast-muted); font-size: .92rem; }
+.mast .intro p { font: 400 1.05rem/1.6 var(--serif); color: #f1e2e5; }
+.cta { display: inline-block; font: 600 .95rem var(--sans); background: var(--mast-fg); color: var(--mast) !important; text-decoration: none !important; padding: .65rem 1.2rem; border-radius: 5px; margin-top: .3rem; }
+.cta + .note { color: var(--mast-muted); margin-top: .6rem; }
+
+.split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(1.5rem, 3.5vw, 3.5rem); align-items: start; }
+.cases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2rem; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; }
+@media (max-width: 1000px) { .cases { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .split, .pair { grid-template-columns: 1fr; } }
+.split > *, .cases > *, .pair > * { min-width: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 1.1rem 1.15rem 1rem; }
+.casecard { border-top: 4px solid var(--c); }
+.casecard h3 { color: var(--c); }
+figure { margin: 0; }
+figure img { border-radius: 4px; border: 1px solid var(--line); background: #fff; }
+figcaption { font-size: .85rem; color: var(--muted); margin-top: .5rem; line-height: 1.5; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: .5rem .7rem .5rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; font-size: .85rem; color: var(--muted); }
+tr.me td { font-weight: 600; }
+.sectitle { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+.sectitle p { margin: 0; max-width: 62ch; color: var(--muted); }
+footer { border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); }
+footer .wrap { padding-block: 1.5rem 2.5rem; display: flex; flex-wrap: wrap; gap: .5rem 2rem; justify-content: space-between; }
 </style>
 </head>
 <body>
-<div class="top"><div class="wide">
-  <a class="home" href="index.html">Formation attitude control</a>
-  <nav aria-label="Pages">
-    <a href="index.html" aria-current="page">About the project</a>
-    <a href="twin.html">Simulation</a>
-    <a href="comparison.html">Comparing the three cases</a>
-    <a href="https://github.com/kaushalrog/Spacecraft-Formation-Attitude-Control">Code on GitHub</a>
-  </nav>
-</div></div>
-
-<main>
-<header class="col intro">
-  <h1>Keeping four spacecraft pointed the same way when their actuators weaken</h1>
-  <div class="byline">Team 14: C Rishitha, Y Karthikeya, Ashwin Tyagi and S Kaushal. School of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore.</div>
-  <p class="lead">In a formation mission, several spacecraft have to turn and hold the same attitude together. In practice their actuators lose effectiveness, torque is limited, there are disturbances, and the model of each spacecraft is never exact.</p>
-  <p>A standard controller recomputes and broadcasts its command at every time step, which costs communication and computation. Event-triggered control updates only when the error has grown enough to matter. Self-triggered control goes a step further and works out in advance when the next update will be needed, so it doesn't have to keep checking.</p>
-  <p>We reproduced the approach from Xie, Sheng and Chen's 2024 paper (reference 1 below) in MATLAB and Simulink. We built a four-spacecraft model and compared three ways of scheduling a fault-tolerant sliding-mode controller.</p>
-  <p><a class="cta" href="twin.html">Open the interactive simulation</a></p>
-  <p class="note">It shows the four spacecraft, their communication links and when each one updates. You can switch between the three cases, inject an actuator fault and watch the attitude errors settle.</p>
+<header class="mast">
+  <div class="wrap">
+    <nav class="top" aria-label="Pages">
+      <a class="home" href="index.html">Formation attitude control</a>
+      <div>
+        <a href="index.html" aria-current="page">About the project</a>
+        <a href="twin.html">Simulation</a>
+        <a href="comparison.html">Comparison</a>
+        <a href="https://github.com/kaushalrog/Spacecraft-Formation-Attitude-Control">Code on GitHub</a>
+      </div>
+    </nav>
+    <div class="hero">
+      <div>
+        <h1>Keeping four spacecraft pointed the same way when their actuators weaken</h1>
+        <div class="byline">Team 14: C Rishitha, Y Karthikeya, Ashwin Tyagi and S Kaushal. School of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore.</div>
+      </div>
+      <div class="intro">
+        <p>In a formation mission, several spacecraft have to turn and hold the same attitude together. In practice actuators lose effectiveness, torque is limited, there are disturbances, and no model is exact. Updating every controller at every time step also costs communication and computation.</p>
+        <p>We rebuilt the approach from Xie, Sheng and Chen's 2024 paper in MATLAB and Simulink, and compared three ways of scheduling the same fault-tolerant controller.</p>
+        <a class="cta" href="twin.html">Open the interactive simulation</a>
+        <p class="note">Four spacecraft, their links and their updates. Switch cases, inject an actuator fault and watch the errors settle.</p>
+      </div>
+    </div>
+  </div>
 </header>
 
-<section class="col">
-  <h2>What we built</h2>
-  <ul>
-    <li>A nonlinear attitude model for four spacecraft, using Modified Rodrigues Parameters. Each spacecraft has three attitude and three angular-velocity states, 24 in total.</li>
-    <li>A distributed sliding-mode controller. Each spacecraft uses its own error and its neighbours' errors through the communication graph.</li>
-    <li>Actuator effectiveness loss, time-varying disturbances, model uncertainty, and torque limited to ±0.2 N·m.</li>
-    <li>Three versions of the same controller. In case 1 the command updates at every time step. In case 2 it updates only when a dynamic trigger condition fires. In case 3 the next update time is computed ahead (self-triggered).</li>
-  </ul>
-  <p>Kaushal built the Simulink model, set up the three triggering cases and produced the graphs and tables. Rishitha did the spacecraft dynamics and disturbances, Karthikeya the sliding-mode controller and fault tolerance, and Ashwin the literature review and mathematical formulation.</p>
-</section>
-
-<section class="wide">
-  <figure>
-    <img src="output_images/Fig02.png" alt="Attitude error of the four spacecraft over 60 seconds in case 1, three components" loading="lazy">
-    <figcaption>Case 1, updates at every step. The attitude errors of all four spacecraft start at different values and settle near zero after about 30 to 40 seconds.</figcaption>
-  </figure>
-  <div class="pair">
-    <figure>
-      <img src="output_images/Fig06.png" alt="Attitude errors in case 2" loading="lazy">
-      <figcaption>Case 2, dynamic event-triggered. Tracking stays close to case 1 without updating all the time.</figcaption>
-    </figure>
-    <figure>
-      <img src="output_images/Fig11.png" alt="Attitude errors in case 3" loading="lazy">
-      <figcaption>Case 3, self-triggered. All four spacecraft settle within about 30 seconds.</figcaption>
-    </figure>
+<main>
+<section class="band">
+  <div class="wrap">
+    <div class="sectitle"><h2 style="margin:0">Three ways to schedule the controller</h2><p>Same sliding-mode controller, same faults and limits. The only difference is when each spacecraft updates its command.</p></div>
+    <div class="cases">
+      <div class="card casecard" style="--c:var(--c1)"><h3>Case 1: every time step</h3><p>The baseline. Commands update continuously, which costs the most communication and computation.</p>
+        <figure><img src="output_images/Fig02.png" alt="Attitude errors of the four spacecraft in case 1" loading="lazy"><figcaption>Attitude errors start at different values and settle near zero after about 30 to 40 s.</figcaption></figure></div>
+      <div class="card casecard" style="--c:var(--c2)"><h3>Case 2: dynamic event-triggered</h3><p>A spacecraft updates only when its error has drifted far enough since the last update.</p>
+        <figure><img src="output_images/Fig06.png" alt="Attitude errors in case 2" loading="lazy"><figcaption>Tracking stays close to case 1 without updating all the time.</figcaption></figure></div>
+      <div class="card casecard" style="--c:var(--c3)"><h3>Case 3: self-triggered</h3><p>Each spacecraft works out in advance when its next update is due, so it doesn't have to keep checking.</p>
+        <figure><img src="output_images/Fig11.png" alt="Attitude errors in case 3" loading="lazy"><figcaption>All four spacecraft settle within about 30 s.</figcaption></figure></div>
+    </div>
   </div>
 </section>
 
-<section class="col">
-  <h2>What we saw</h2>
-  <p>All three cases bring every spacecraft to the shared attitude, and the angular-velocity errors settle as well. The torque commands stay inside the ±0.2 N·m limit throughout.</p>
-  <p>The differences are in how often the controller acts. In case 2 the torque switches back and forth more often, because the command only changes at trigger events, but it stays within the limit. The trigger plots show each spacecraft updating at its own irregular times, not on a fixed clock. That is what saves communication and computation compared with case 1.</p>
-</section>
-
-<section class="wide">
-  <div class="pair">
-    <figure>
-      <img src="output_images/Fig09.png" alt="Control torques with amplitude limits in case 2" loading="lazy">
-      <figcaption>Case 2 torques, limited to ±0.2 N·m. The command changes only at trigger events, so it switches more often than in case 1.</figcaption>
-    </figure>
-    <figure>
-      <img src="output_images/Fig15.png" alt="Triggering instants for each spacecraft in case 3" loading="lazy">
-      <figcaption>Case 3: when each spacecraft updated its controller. The spacing changes with time instead of being fixed.</figcaption>
-    </figure>
+<section class="band">
+  <div class="wrap split">
+    <div>
+      <h2>What we built</h2>
+      <ul class="prose">
+        <li>A nonlinear attitude model of four spacecraft using Modified Rodrigues Parameters, with 3 attitude and 3 angular-velocity states each, 24 in total.</li>
+        <li>A distributed sliding-mode controller. Each spacecraft uses its own error and its neighbours' errors through the communication graph.</li>
+        <li>Actuator effectiveness loss, time-varying disturbances, model uncertainty and torque limited to ±0.2 N·m.</li>
+        <li>The three triggering cases above, in one Simulink model with a case selector.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Who did what</h3>
+      <table>
+        <thead><tr><th>Member</th><th>Work</th></tr></thead>
+        <tbody>
+          <tr><td>Ashwin Tyagi</td><td>Literature review, paper analysis, mathematical formulation</td></tr>
+          <tr><td>C Rishitha</td><td>Spacecraft dynamics, MRPs, disturbances</td></tr>
+          <tr><td>Y Karthikeya</td><td>Sliding-mode controller, fault tolerance</td></tr>
+          <tr class="me"><td>S Kaushal</td><td>Simulink model, triggering cases, graphs and tables</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <p class="note col" style="padding:0">All 14 figures (Fig02 to Fig15) are in the <a href="https://github.com/kaushalrog/Spacecraft-Formation-Attitude-Control/tree/main/output_images">output_images folder</a>. Running <code>sff_run_all</code> in MATLAB regenerates them.</p>
 </section>
 
-<section class="col">
-  <h2>What this doesn't cover yet</h2>
-  <ul>
-    <li>Everything is numerical simulation. There is no hardware-in-the-loop or experimental test.</li>
-    <li>Only four spacecraft. We haven't looked at how communication and computation grow with larger formations.</li>
-    <li>Faults are a fixed loss of actuator effectiveness. Multiple, time-varying or intermittent faults aren't modelled, and neither are communication delays or packet loss.</li>
-  </ul>
-  <p>The next steps would be hardware-in-the-loop testing, larger formations, those richer fault and communication models, and adaptive tuning of the controller gains and trigger parameters.</p>
+<section class="band">
+  <div class="wrap split">
+    <div>
+      <h2>What we saw</h2>
+      <div class="prose">
+        <p>All three cases bring every spacecraft to the shared attitude, and the angular-velocity errors settle too. The torque commands stay inside the ±0.2 N·m limit throughout.</p>
+        <p>The difference is how often the controller acts. In case 2 the torque switches back and forth more often, because the command only changes at trigger events, but it stays within the limit. The trigger plots show each spacecraft updating at its own irregular times instead of on a fixed clock. That's where the savings in communication and computation come from.</p>
+        <p class="note">All 14 figures, Fig02 to Fig15, are in the <a href="https://github.com/kaushalrog/Spacecraft-Formation-Attitude-Control/tree/main/output_images">output_images folder</a>. Running <code>sff_run_all</code> in MATLAB regenerates them.</p>
+      </div>
+    </div>
+    <div class="pair">
+      <figure><img src="output_images/Fig09.png" alt="Control torques with amplitude limits in case 2" loading="lazy"><figcaption>Case 2 torques, held within ±0.2 N·m.</figcaption></figure>
+      <figure><img src="output_images/Fig15.png" alt="Triggering instants for each spacecraft in case 3" loading="lazy"><figcaption>Case 3: when each spacecraft updated. The spacing varies.</figcaption></figure>
+    </div>
+  </div>
+</section>
 
-  <h2>References</h2>
-  <ol>
-    <li>X. Xie, T. Sheng and X. Chen, "Dynamic event-triggered and self-triggered fault-tolerant attitude control for multiple spacecraft systems with uncertainties and input saturation," <em>IEEE Transactions on Aerospace and Electronic Systems</em>, vol. 60, no. 3, pp. 2922–2933, June 2024.</li>
-    <li>X. Xie, T. Sheng and X. He, "Distributed event-triggered attitude synchronization for multiple spacecraft systems," <em>IEEE Transactions on Aerospace and Electronic Systems</em>, 2021.</li>
-  </ol>
+<section class="band">
+  <div class="wrap split">
+    <div>
+      <h2>What this doesn't cover yet</h2>
+      <ul class="prose">
+        <li>Everything is numerical simulation. There's no hardware-in-the-loop or experimental test.</li>
+        <li>Only four spacecraft. We haven't measured how communication and computation grow with larger formations.</li>
+        <li>Faults are a fixed loss of actuator effectiveness. Multiple, time-varying or intermittent faults, communication delays and packet loss aren't modelled.</li>
+      </ul>
+      <p class="prose">Next steps would be hardware-in-the-loop testing, larger formations, richer fault and communication models, and adaptive tuning of the controller gains and trigger parameters.</p>
+    </div>
+    <div>
+      <h2>References</h2>
+      <ol>
+        <li>X. Xie, T. Sheng and X. Chen, "Dynamic event-triggered and self-triggered fault-tolerant attitude control for multiple spacecraft systems with uncertainties and input saturation," <em>IEEE Transactions on Aerospace and Electronic Systems</em>, vol. 60, no. 3, pp. 2922–2933, June 2024.</li>
+        <li>X. Xie, T. Sheng and X. He, "Distributed event-triggered attitude synchronization for multiple spacecraft systems," <em>IEEE Transactions on Aerospace and Electronic Systems</em>, 2021.</li>
+      </ol>
+    </div>
+  </div>
 </section>
 </main>
 
-<footer><div class="wide">
-  <div>Team 14, School of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore.</div>
-  <div>Our next project, on laser links between satellites: <a href="https://kaushalrog.github.io/Satellite-Optical-Fault-Recovery/">kaushalrog.github.io/Satellite-Optical-Fault-Recovery</a></div>
+<footer><div class="wrap">
+  <div>Team 14, School of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore</div>
+  <div>Our next project: <a href="https://kaushalrog.github.io/Satellite-Optical-Fault-Recovery/">laser links between satellites</a></div>
 </div></footer>
 </body>
 </html>
