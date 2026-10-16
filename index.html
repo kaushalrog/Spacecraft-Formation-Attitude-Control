@@ -1,24 +1,153 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Formation Autonomy / Resilience Digital Twin</title><link rel="stylesheet" href="web/style.css"></head>
-<body><a class="skip" href="#mission">Skip to mission</a>
-<header><a class="brand" href="index.html"><span class="brand-icon" aria-hidden="true">⌁</span><span>FORMATION <b>AUTONOMY</b><small>SPACECRAFT CONTROL & RESILIENCE DIGITAL TWIN</small></span></a><nav aria-label="Primary"><a class="active" href="index.html">Mission control</a><a href="comparison.html">Comparison lab</a><a href="baseline/index.html">Legacy baseline ↗</a></nav><span class="tag">RESEARCH TESTBED <i></i></span></header>
-<div class="missionbar"><div><span class="eyebrow">MISSION ID</span><b>FORMATION-AUTONOMY-01</b></div><div><span class="eyebrow">SIMULATION</span><b id="status">INITIALIZING</b></div><div><span class="eyebrow">CONTROLLER</span><b id="modeLabel">ADAPTIVE</b></div><div><span class="eyebrow">ESTIMATED ACTUATOR HEALTH</span><b id="health">—</b></div><div><span class="eyebrow">BUDGET USED</span><b id="load">—</b></div><div><span class="eyebrow">FAULT STATUS</span><b id="faultState">UNOBSERVABLE</b></div></div>
-<main id="mission" class="layout">
-<aside class="panel controls"><div class="panel-head"><h2>Mission configuration</h2><span class="serial">01</span></div><div class="pad">
-<label for="scenario">SCENARIO</label><select id="scenario"></select><p id="scenarioDescription" class="muted"></p>
-<label for="mode">CONTROL POLICY</label><select id="mode"><optgroup label="BASELINE · supplied MATLAB semantics"><option value="baseline-time">Case 1 / Time-driven</option><option value="baseline-event">Case 2 / Dynamic event</option><option value="baseline-self">Case 3 / Self-triggered</option></optgroup><optgroup label="PROPOSED · experimental"><option selected value="adaptive">Adaptive event-triggered</option><option value="fault-self">Fault-aware self-triggered</option><option value="optimized">Optimized controller</option></optgroup></select>
-<details><summary>Fault injection</summary><label for="faultCraft">SPACECRAFT</label><select id="faultCraft"><option value="1">SC2</option><option value="0">SC1</option><option value="2">SC3</option><option value="3">SC4</option></select><label for="faultKind">PROFILE</label><select id="faultKind"><option>sudden</option><option>gradual</option><option>intermittent</option></select><label for="faultTime">ONSET / SECONDS</label><input id="faultTime" type="number" min="0" max="59" value="20"><label for="effect">EFFECTIVENESS / X, Y, Z</label><input id="effect" value="0.8, 0.45, 0.8" aria-describedby="effectHelp"><small id="effectHelp">Each axis: 0 = failed, 1 = healthy</small><button id="inject">Apply profile & recompute</button></details>
-<details open><summary>Communication constraints</summary><label for="budget">BROADCAST BUDGET / SPACECRAFT</label><select id="budget"><option>1000</option><option selected>500</option><option>250</option><option>100</option><option>50</option></select><p class="muted">Local control continues when the broadcast budget is exhausted.</p></details>
-<details><summary>Optimization priorities</summary><div id="weights"></div><button id="optimize">Run NSGA-II</button><p class="muted">48 candidates · 2 training seeds. Selection is experimental; no guaranteed improvement.</p></details>
-<details><summary>Onboard resource model</summary><label for="hardware">SIMULATED RESOURCE MODEL</label><select id="hardware"><option value="20">CubeSat / 20 Mops/s</option><option selected value="100">Standard / 100 Mops/s</option><option value="500">High performance / 500 Mops/s</option></select><div id="resources" class="muted"></div></details>
-<div class="configuration-note">ATTITUDE DYNAMICS ONLY<br><span>Schematic positions. No orbital translation or flight hardware.</span></div>
-<button id="demo" class="wide">Launch guided demo <span>03:00</span></button>
-</div></aside>
-<section class="center"><div class="kpis" id="kpis"></div>
-<div class="panel scene-panel"><div class="panel-head"><h2><span class="live-dot"></span> Formation / spatial view</h2><div><button id="focus" title="Center on the selected spacecraft">Focus</button><button id="follow" aria-pressed="false">Follow axis</button><button id="fullscreen">Fullscreen</button></div></div><div class="scene-wrap"><canvas id="scene" tabindex="0" aria-label="Schematic 3D formation. Arrow keys rotate, Shift plus arrow keys pan, plus and minus zoom. Select spacecraft below."></canvas><div class="scene-title"><span class="eyebrow">DISTRIBUTED ATTITUDE CONTROL</span><h1>Four vehicles.<br>One reference.</h1><p id="sceneCaption">Nonlinear dynamics · directed topology</p></div><div class="scene-clock"><span>MISSION ELAPSED</span><b id="clock">T+00:00.0</b></div><div class="scene-legend"><span><i style="background:#62d8f0"></i>Body orientation</span><span><i style="background:#efc56e"></i>Angular velocity</span><span><i style="background:#8bd1a6"></i>Broadcast link</span></div><div class="view-tools"><button id="rotateLeft" aria-label="Rotate left">←</button><button id="rotateRight" aria-label="Rotate right">→</button><button id="zoomIn" aria-label="Zoom in">＋</button><button id="zoomOut" aria-label="Zoom out">−</button><button id="homeView">Reset view</button></div></div><div class="craft-cards" id="craftCards"></div></div>
-<div class="transport panel"><button id="play" class="primary">Run playback</button><button id="step">+1 s</button><button id="reset">Reset</button><label for="speed" class="sr-only">Playback speed</label><select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="3">3×</option><option value="10">10×</option></select><label for="scrub" class="sr-only">Mission time</label><input id="scrub" type="range" min="0" max="60" step=".1" value="0"><span id="endTime">60 s</span></div>
-<div class="panel"><div class="panel-head"><h2>Mission event timeline</h2><span class="serial">Select an event to inspect</span></div><div id="timeline" class="timeline"></div></div>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spacecraft Formation Attitude Control</title>
+<meta name="description" content="Team 14 course project at Amrita: event-triggered and self-triggered fault-tolerant attitude control for four spacecraft, in MATLAB/Simulink, with an interactive simulation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Plain course-project page: one reading column, wide figures, maroon accent taken from the team's slides. */
+:root {
+  --bg: #fcfbf9; --fg: #1c1b1b; --muted: #5f5c5a; --line: #ddd8d3; --soft: #f3f0ec; --accent: #8a1538;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161415; --fg: #e8e4e1; --muted: #a59f9b; --line: #36312f; --soft: #201d1d; --accent: #e07a96; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #161415; --fg: #e8e4e1; --muted: #a59f9b; --line: #36312f; --soft: #201d1d; --accent: #e07a96; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 1.0625rem/1.65 var(--serif); }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+img { max-width: 100%; height: auto; display: block; }
+h1, h2, h3 { line-height: 1.2; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.6rem); margin: 0 0 .6rem; }
+h2 { font-size: 1.5rem; margin: 3rem 0 .8rem; }
+h3 { font-size: 1.1rem; margin: 1.6rem 0 .4rem; }
+p { margin: 0 0 1rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin-bottom: .35rem; }
+.col { max-width: 720px; margin: 0 auto; padding-inline: 20px; }
+.wide { max-width: 1060px; margin: 0 auto; padding-inline: 20px; }
+.top { border-bottom: 1px solid var(--line); font-family: var(--sans); font-size: .9rem; }
+.top .wide { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; padding-block: .7rem; }
+.top nav { display: flex; gap: 1.1rem; flex-wrap: wrap; }
+.top a { color: var(--fg); text-decoration: none; }
+.top a:hover, .top a[aria-current] { text-decoration: underline; }
+.top .home { font-weight: 600; }
+.intro { padding-top: 2.5rem; }
+.byline { font-family: var(--sans); font-size: .9rem; color: var(--muted); margin-bottom: 1.6rem; }
+.lead { font-size: 1.15rem; }
+.cta { display: inline-block; font: 600 .95rem var(--sans); background: var(--accent); color: #fff; text-decoration: none; padding: .65rem 1.1rem; border-radius: 4px; margin: .4rem 0 .4rem; }
+.note { font-family: var(--sans); font-size: .88rem; color: var(--muted); }
+figure { margin: 2rem 0; }
+figure img { border: 1px solid var(--line); background: #fff; }
+figcaption { font-family: var(--sans); font-size: .85rem; color: var(--muted); margin-top: .5rem; line-height: 1.5; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+@media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+.pair figure { margin: 0; }
+table { border-collapse: collapse; width: 100%; font-family: var(--sans); font-size: .9rem; margin: .8rem 0 1.2rem; }
+th, td { text-align: left; padding: .45rem .6rem .45rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; }
+.tablewrap { overflow-x: auto; }
+footer { margin-top: 4rem; border-top: 1px solid var(--line); font-family: var(--sans); font-size: .88rem; color: var(--muted); }
+footer .wide { padding-block: 1.5rem 3rem; display: grid; gap: .4rem; }
+</style>
+</head>
+<body>
+<div class="top"><div class="wide">
+  <a class="home" href="index.html">Formation attitude control</a>
+  <nav aria-label="Pages">
+    <a href="index.html" aria-current="page">About the project</a>
+    <a href="twin.html">Simulation</a>
+    <a href="comparison.html">Comparing the three cases</a>
+    <a href="https://github.com/kaushalrog/Spacecraft-Formation-Attitude-Control">Code on GitHub</a>
+  </nav>
+</div></div>
+
+<main>
+<header class="col intro">
+  <h1>Keeping four spacecraft pointed the same way when their actuators weaken</h1>
+  <div class="byline">Team 14: C Rishitha, Y Karthikeya, Ashwin Tyagi and S Kaushal. School of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore.</div>
+  <p class="lead">In a formation mission, several spacecraft have to turn and hold the same attitude together. In practice their actuators lose effectiveness, torque is limited, there are disturbances, and the model of each spacecraft is never exact.</p>
+  <p>A standard controller recomputes and broadcasts its command at every time step, which costs communication and computation. Event-triggered control updates only when the error has grown enough to matter. Self-triggered control goes a step further and works out in advance when the next update will be needed, so it doesn't have to keep checking.</p>
+  <p>We reproduced the approach from Xie, Sheng and Chen's 2024 paper (reference 1 below) in MATLAB and Simulink. We built a four-spacecraft model and compared three ways of scheduling a fault-tolerant sliding-mode controller.</p>
+  <p><a class="cta" href="twin.html">Open the interactive simulation</a></p>
+  <p class="note">It shows the four spacecraft, their communication links and when each one updates. You can switch between the three cases, inject an actuator fault and watch the attitude errors settle.</p>
+</header>
+
+<section class="col">
+  <h2>What we built</h2>
+  <ul>
+    <li>A nonlinear attitude model for four spacecraft, using Modified Rodrigues Parameters. Each spacecraft has three attitude and three angular-velocity states, 24 in total.</li>
+    <li>A distributed sliding-mode controller. Each spacecraft uses its own error and its neighbours' errors through the communication graph.</li>
+    <li>Actuator effectiveness loss, time-varying disturbances, model uncertainty, and torque limited to ±0.2 N·m.</li>
+    <li>Three versions of the same controller. In case 1 the command updates at every time step. In case 2 it updates only when a dynamic trigger condition fires. In case 3 the next update time is computed ahead (self-triggered).</li>
+  </ul>
+  <p>Kaushal built the Simulink model, set up the three triggering cases and produced the graphs and tables. Rishitha did the spacecraft dynamics and disturbances, Karthikeya the sliding-mode controller and fault tolerance, and Ashwin the literature review and mathematical formulation.</p>
 </section>
-<aside class="panel inspector"><div class="panel-head"><h2>Vehicle inspector</h2><span class="serial" id="selectedLabel">SC2</span></div><div class="pad"><div id="selectors" class="selectors"></div><div class="vehicle-title"><span class="vehicle-symbol">◇</span><div><h2 id="vehicleName">SPACECRAFT 02</h2><span id="vehicleState">OBSERVING</span></div></div><div id="actuators"></div><dl id="telemetry"></dl><div class="decision"><span class="eyebrow">EXPLAIN DECISION</span><h3 id="decisionTitle">Waiting for telemetry</h3><p id="decisionText"></p><dl id="decisionData"></dl></div><details><summary>State & dynamics</summary><pre id="stateVector"></pre></details></div></aside>
-<section class="panel analysis"><div class="tabs" role="tablist" aria-label="Analysis"><button role="tab" aria-selected="true" data-tab="Telemetry">Telemetry</button><button role="tab" aria-selected="false" data-tab="Errors">Errors</button><button role="tab" aria-selected="false" data-tab="Control">Control</button><button role="tab" aria-selected="false" data-tab="Triggers">Triggers</button><button role="tab" aria-selected="false" data-tab="Faults">Faults</button><button role="tab" aria-selected="false" data-tab="Communication">Communication</button><button role="tab" aria-selected="false" data-tab="Optimization">Optimization</button><button role="tab" aria-selected="false" data-tab="Monte Carlo">Monte Carlo</button></div><div class="analysis-head"><div><h2 id="plotTitle">Attitude tracking error</h2><p id="plotSubtitle">MRP error norm · SC1 / SC2 / SC3 / SC4</p></div><div class="exports"><button id="exportJSON">JSON</button><button id="exportCSV">CSV</button><button id="exportPNG">PNG</button><button id="report">Print / PDF</button></div></div><canvas id="plot" aria-label="Simulation time history"></canvas><div id="researchContent" hidden></div></section>
-</main><div id="notice" role="status" aria-live="polite"></div><div id="busy" hidden><span id="busyText">Computing simulation</span><progress id="progress" max="1" value="0"></progress><button id="cancel">Cancel</button></div><footer><span>PHYSICS-BASED · REPRODUCIBLE · EXPLAINABLE</span><span>Baseline preserved / <a href="docs/ARCHITECTURE.md">Architecture & provenance ↗</a></span></footer><script type="module" src="web/app.mjs"></script></body></html>
+
+<section class="wide">
+  <figure>
+    <img src="output_images/Fig02.png" alt="Attitude error of the four spacecraft over 60 seconds in case 1, three components" loading="lazy">
+    <figcaption>Case 1, updates at every step. The attitude errors of all four spacecraft start at different values and settle near zero after about 30 to 40 seconds.</figcaption>
+  </figure>
+  <div class="pair">
+    <figure>
+      <img src="output_images/Fig06.png" alt="Attitude errors in case 2" loading="lazy">
+      <figcaption>Case 2, dynamic event-triggered. Tracking stays close to case 1 without updating all the time.</figcaption>
+    </figure>
+    <figure>
+      <img src="output_images/Fig11.png" alt="Attitude errors in case 3" loading="lazy">
+      <figcaption>Case 3, self-triggered. All four spacecraft settle within about 30 seconds.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="col">
+  <h2>What we saw</h2>
+  <p>All three cases bring every spacecraft to the shared attitude, and the angular-velocity errors settle as well. The torque commands stay inside the ±0.2 N·m limit throughout.</p>
+  <p>The differences are in how often the controller acts. In case 2 the torque switches back and forth more often, because the command only changes at trigger events, but it stays within the limit. The trigger plots show each spacecraft updating at its own irregular times, not on a fixed clock. That is what saves communication and computation compared with case 1.</p>
+</section>
+
+<section class="wide">
+  <div class="pair">
+    <figure>
+      <img src="output_images/Fig09.png" alt="Control torques with amplitude limits in case 2" loading="lazy">
+      <figcaption>Case 2 torques, limited to ±0.2 N·m. The command changes only at trigger events, so it switches more often than in case 1.</figcaption>
+    </figure>
+    <figure>
+      <img src="output_images/Fig15.png" alt="Triggering instants for each spacecraft in case 3" loading="lazy">
+      <figcaption>Case 3: when each spacecraft updated its controller. The spacing changes with time instead of being fixed.</figcaption>
+    </figure>
+  </div>
+  <p class="note col" style="padding:0">All 14 figures (Fig02 to Fig15) are in the <a href="https://github.com/kaushalrog/Spacecraft-Formation-Attitude-Control/tree/main/output_images">output_images folder</a>. Running <code>sff_run_all</code> in MATLAB regenerates them.</p>
+</section>
+
+<section class="col">
+  <h2>What this doesn't cover yet</h2>
+  <ul>
+    <li>Everything is numerical simulation. There is no hardware-in-the-loop or experimental test.</li>
+    <li>Only four spacecraft. We haven't looked at how communication and computation grow with larger formations.</li>
+    <li>Faults are a fixed loss of actuator effectiveness. Multiple, time-varying or intermittent faults aren't modelled, and neither are communication delays or packet loss.</li>
+  </ul>
+  <p>The next steps would be hardware-in-the-loop testing, larger formations, those richer fault and communication models, and adaptive tuning of the controller gains and trigger parameters.</p>
+
+  <h2>References</h2>
+  <ol>
+    <li>X. Xie, T. Sheng and X. Chen, "Dynamic event-triggered and self-triggered fault-tolerant attitude control for multiple spacecraft systems with uncertainties and input saturation," <em>IEEE Transactions on Aerospace and Electronic Systems</em>, vol. 60, no. 3, pp. 2922–2933, June 2024.</li>
+    <li>X. Xie, T. Sheng and X. He, "Distributed event-triggered attitude synchronization for multiple spacecraft systems," <em>IEEE Transactions on Aerospace and Electronic Systems</em>, 2021.</li>
+  </ol>
+</section>
+</main>
+
+<footer><div class="wide">
+  <div>Team 14, School of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore.</div>
+  <div>Our next project, on laser links between satellites: <a href="https://kaushalrog.github.io/Satellite-Optical-Fault-Recovery/">kaushalrog.github.io/Satellite-Optical-Fault-Recovery</a></div>
+</div></footer>
+</body>
+</html>
