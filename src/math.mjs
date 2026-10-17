@@ -10,7 +10,7 @@ export function kinematics(s,w) {return add(add(mul(w,.25*(1-dot(s,s))),mul(cros
 export function reference(t) {
  const s=[3+2*Math.sin(.1*t),5+3*Math.cos(.2*t),-2+Math.cos(.1*t)].map(v=>v*.001);
  const ds=[.2*Math.cos(.1*t),-.6*Math.sin(.2*t),-.1*Math.sin(.1*t)].map(v=>v*.001);
- // G G' = (1+s's)^2 I/16. Transpose reverses the skew term.
+ // G G' = (1+s's)^2 I/16. Transpose reverses the skew term
  const w=mul(add(add(mul(ds,.25*(1-dot(s,s))),mul(cross(s,ds),-.5)),mul(s,.5*dot(s,ds))),16/(1+dot(s,s))**2);
  return {s,w};
 }
